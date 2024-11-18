@@ -5,6 +5,7 @@ using Novin.Library.Backend.API.DTOs.Books;
 using Novin.Library.Backend.API.Entities;
 using Novin.Library.Backend.API.Interfaces;
 using Novin.Library.Backend.API.Repositories;
+using Novin.Library.Backend.API.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,6 +22,7 @@ builder.Services.AddDbContext<LibraryDB>(options =>
 builder.Services.AddScoped<IRepository<Book>, GenericRepository<Book>>();
 builder.Services.AddScoped<IRepository<Subscriber>, SubscriberRepository>();
 builder.Services.AddScoped<IRepository<Borrow>, BorrowRepository>();
+builder.Services.AddScoped<BookService, BookService>();
 
 
 var app = builder.Build();
@@ -39,49 +41,21 @@ if (app.Environment.IsDevelopment())
 
 // Book CRUD
 
-app.MapGet("/books/list", (IRepository<Book> repository) =>
+app.MapGet("/books/list", (BookService bookService) =>
 {
-    return Results.Ok(repository.GetAll()
-    .Select(b=>new BookDto
-    {
-        Guid = b.Guid,
-        Title = b.Title,
-        Author = b.Author,
-        Price = b.Price
-    })
-    .ToList());
+    return Results.Ok(bookService.List());
 });
-app.MapPost("/books/add", (IRepository<Book> repository, BookAddOrUpdateDto book) =>
+app.MapPost("/books/add", (BookService bookService, BookAddOrUpdateDto book) =>
 {
-    var b = new Book{
-        Title = book.Title,
-        Author = book.Author,
-        Price = book.Price
-    };
-    repository.Add(b);
+    bookService.Add(book);
 });
-app.MapPut("/books/update/{guid}", (IRepository<Book> repository, string guid, BookAddOrUpdateDto book) =>
+app.MapPut("/books/update/{guid}", (BookService bookService, string guid, BookAddOrUpdateDto book) =>
 {
-    var dbBook = repository.GetByGuid(guid);
-    if (dbBook != null)
-    {
-        dbBook.Author = book.Author;
-        dbBook.Price = book.Price;
-        dbBook.Title = book.Title;
-        repository.Update(dbBook);
-        return Results.Ok();
-    }
-    return Results.NotFound();
+    bookService.Update(guid, book);
 });
-app.MapDelete("/books/delete/{guid}", (IRepository<Book> repository, string guid) =>
+app.MapDelete("/books/delete/{guid}", (BookService bookService, string guid) =>
 {
-    var dbBook = repository.GetByGuid(guid);
-    if (dbBook != null)
-    {
-        repository.Remove(dbBook);
-        return Results.Ok();
-    }
-    return Results.NotFound();
+    bookService.Remove(guid);
 });
 
 
