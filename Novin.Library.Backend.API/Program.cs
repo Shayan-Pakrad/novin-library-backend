@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.DataProtection.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Novin.Library.Backend.API.DbContexts;
+using Novin.Library.Backend.API.DTOs.Books;
 using Novin.Library.Backend.API.Entities;
 using Novin.Library.Backend.API.Interfaces;
 using Novin.Library.Backend.API.Repositories;
@@ -40,13 +41,26 @@ if (app.Environment.IsDevelopment())
 
 app.MapGet("/books/list", (IRepository<Book> repository) =>
 {
-    return Results.Ok(repository.GetAll().ToList());
+    return Results.Ok(repository.GetAll()
+    .Select(b=>new BookDto
+    {
+        Guid = b.Guid,
+        Title = b.Title,
+        Author = b.Author,
+        Price = b.Price
+    })
+    .ToList());
 });
-app.MapPost("/books/add", (IRepository<Book> repository, Book book) =>
+app.MapPost("/books/add", (IRepository<Book> repository, BookAddOrUpdateDto book) =>
 {
-    repository.Add(book);
+    var b = new Book{
+        Title = book.Title,
+        Author = book.Author,
+        Price = book.Price
+    };
+    repository.Add(b);
 });
-app.MapPut("/books/update/{guid}", (IRepository<Book> repository, string guid, Book book) =>
+app.MapPut("/books/update/{guid}", (IRepository<Book> repository, string guid, BookAddOrUpdateDto book) =>
 {
     var dbBook = repository.GetByGuid(guid);
     if (dbBook != null)
