@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.DataProtection.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Novin.Library.Backend.API.DbContexts;
 using Novin.Library.Backend.API.DTOs.Books;
+using Novin.Library.Backend.API.DTOs.Subscribers;
 using Novin.Library.Backend.API.Entities;
 using Novin.Library.Backend.API.Interfaces;
 using Novin.Library.Backend.API.Repositories;
@@ -23,6 +24,7 @@ builder.Services.AddScoped<IRepository<Book>, BookRepository>();
 builder.Services.AddScoped<IRepository<Subscriber>, SubscriberRepository>();
 builder.Services.AddScoped<IRepository<Borrow>, BorrowRepository>();
 builder.Services.AddScoped<BookService, BookService>();
+// builder.Services.AddScoped<SubscriberDto, SubscriberDto>();
 
 
 var app = builder.Build();
@@ -65,13 +67,25 @@ app.MapDelete("/books/delete/{guid}", (BookService bookService, string guid) =>
 
 app.MapGet("/subs/list", (IRepository<Subscriber> repository) =>
 {
-    return Results.Ok(repository.GetAll().ToList());
+    return Results.Ok(repository.GetAll()
+    .Select(s=>new SubscriberDto{
+        Guid = s.Guid,
+        Address = s.Address,
+        Fullname = s.Fullname,
+        PhoneNumber = s.PhoneNumber
+    })
+    .ToList());
 });
-app.MapPost("/subs/add", (IRepository<Subscriber> repository, Subscriber sub) =>
+app.MapPost("/subs/add", (IRepository<Subscriber> repository, SubscriberAddOrUpdateDto sub) =>
 {
-    repository.Add(sub);
+    var s = new Subscriber{
+        Address = sub.Address,
+        Fullname = sub.Fullname,
+        PhoneNumber = sub.PhoneNumber
+    };
+    repository.Add(s);
 });
-app.MapPut("/subs/update/{guid}", (IRepository<Subscriber> repository, string guid, Subscriber sub) =>
+app.MapPut("/subs/update/{guid}", (IRepository<Subscriber> repository, string guid, SubscriberAddOrUpdateDto sub) =>
 {
     var dbSub = repository.GetByGuid(guid);
     if (dbSub != null)
