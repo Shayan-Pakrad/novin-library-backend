@@ -2,7 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Novin.Library.Backend.API.DTOs.Books;
 using Novin.Library.Backend.API.DTOs.Borrows;
+using Novin.Library.Backend.API.DTOs.Subscribers;
 using Novin.Library.Backend.API.Entities;
 using Novin.Library.Backend.API.Interfaces;
 
@@ -23,10 +25,20 @@ namespace Novin.Library.Backend.API.Services
             .Select(b => new BorrowDto{
                 Guid = b.Guid,
                 BorrowDate = b.BorrowDate,
-                ReturnDate = b.ReturnDate,
-                Book = b.Book,
+                Book = new BookDto{
+                    Guid = b.Book.Guid,
+                    Title = b.Book.Title,
+                    Author = b.Book.Author,
+                    Price = b.Book.Price,
+                    PriceBeTooman = b.Book.Price / 10
+                },
                 BookId = b.BookId,
-                Subscriber = b.Subscriber,
+                Subscriber = new SubscriberDto{
+                    Guid = b.Subscriber.Guid,
+                    Fullname = b.Subscriber.Fullname,
+                    PhoneNumber = b.Subscriber.PhoneNumber,
+                    Address = b.Subscriber.Address
+                },
                 SubscriberId = b.SubscriberId
             })
             .ToList();
