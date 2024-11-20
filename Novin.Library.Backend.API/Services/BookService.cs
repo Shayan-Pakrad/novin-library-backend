@@ -28,7 +28,8 @@ namespace Novin.Library.Backend.API.Services
                 Guid = b.Guid,
                 Title = b.Title,
                 Author = b.Author,
-                Price = b.Price
+                Price = b.Price,
+                PriceBeTooman = b.Price / 10
             })
             .ToList();
         }
