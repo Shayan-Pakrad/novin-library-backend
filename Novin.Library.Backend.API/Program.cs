@@ -19,7 +19,7 @@ builder.Services.AddDbContext<LibraryDB>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("Library"));
 });
 
-builder.Services.AddScoped<IRepository<Book>, GenericRepository<Book>>();
+builder.Services.AddScoped<IRepository<Book>, BookRepository>();
 builder.Services.AddScoped<IRepository<Subscriber>, SubscriberRepository>();
 builder.Services.AddScoped<IRepository<Borrow>, BorrowRepository>();
 builder.Services.AddScoped<BookService, BookService>();
