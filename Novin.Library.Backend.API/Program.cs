@@ -26,6 +26,7 @@ builder.Services.AddScoped<IRepository<Subscriber>, SubscriberRepository>();
 builder.Services.AddScoped<IRepository<Borrow>, BorrowRepository>();
 builder.Services.AddScoped<BookService, BookService>();
 builder.Services.AddScoped<SubscriberService, SubscriberService>();
+builder.Services.AddScoped<BorrowService, BorrowService>();
 
 
 var app = builder.Build();
@@ -89,55 +90,21 @@ app.MapDelete("/subs/delete/{guid}", (SubscriberService subscriberService, strin
 
 // Borrow CRUD
 
-app.MapGet("/borrows/list", (IRepository<Borrow> repository) =>
+app.MapGet("/borrows/list", (BorrowService borrowService) =>
 {
-    return Results.Ok(repository.GetAll()
-    .Select(b => new BorrowDto{
-        Guid = b.Guid,
-        BorrowDate = b.BorrowDate,
-        ReturnDate = b.ReturnDate,
-        Book = b.Book,
-        BookId = b.BookId,
-        Subscriber = b.Subscriber,
-        SubscriberId = b.SubscriberId
-    })
-    .ToList());
+    return Results.Ok(borrowService.List());
 });
-app.MapPost("/borrows/add", (IRepository<Borrow> repository, BorrowAddOrUpdateDto borrow) =>
+app.MapPost("/borrows/add", (BorrowService borrowService, BorrowAddOrUpdateDto borrow) =>
 {
-    var b = new Borrow{
-        BorrowDate = borrow.BorrowDate,
-        ReturnDate = borrow.ReturnDate,
-        Book = borrow.Book,
-        BookId = borrow.BookId,
-        Subscriber = borrow.Subscriber,
-        SubscriberId = borrow.SubscriberId
-    };
-    repository.Add(b);
+    borrowService.Add(borrow);
 });
-app.MapPut("/borrows/update/{guid}", (IRepository<Borrow> repository, string guid, BorrowAddOrUpdateDto borrow) =>
+app.MapPut("/borrows/update/{guid}", (BorrowService borrowService, string guid, BorrowAddOrUpdateDto borrow) =>
 {
-    var dbBorrow = repository.GetByGuid(guid);
-    if (dbBorrow != null)
-    {
-        dbBorrow.BookId = borrow.BookId;
-        dbBorrow.BorrowDate = borrow.BorrowDate;
-        dbBorrow.ReturnDate = borrow.ReturnDate;
-        dbBorrow.SubscriberId = borrow.SubscriberId;
-        repository.Update(dbBorrow);
-        return Results.Ok();
-    }
-    return Results.NotFound();
+    borrowService.Update(guid, borrow);
 });
-app.MapDelete("/borrows/delete/{guid}", (IRepository<Borrow> repository, string guid) =>
+app.MapDelete("/borrows/delete/{guid}", (BorrowService borrowService, string guid) =>
 {
-    var dbBorrow = repository.GetByGuid(guid);
-    if (dbBorrow != null)
-    {
-        repository.Remove(dbBorrow);
-        return Results.Ok();
-    }
-    return Results.NotFound();
+    borrowService.Remove(guid);
 });
 
 
