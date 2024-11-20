@@ -25,7 +25,7 @@ builder.Services.AddScoped<IRepository<Book>, BookRepository>();
 builder.Services.AddScoped<IRepository<Subscriber>, SubscriberRepository>();
 builder.Services.AddScoped<IRepository<Borrow>, BorrowRepository>();
 builder.Services.AddScoped<BookService, BookService>();
-// builder.Services.AddScoped<SubscriberDto, SubscriberDto>();
+builder.Services.AddScoped<SubscriberService, SubscriberService>();
 
 
 var app = builder.Build();
@@ -66,48 +66,21 @@ app.MapDelete("/books/delete/{guid}", (BookService bookService, string guid) =>
 
 // Subscriber CRUD
 
-app.MapGet("/subs/list", (IRepository<Subscriber> repository) =>
+app.MapGet("/subs/list", (SubscriberService subscriberService) =>
 {
-    return Results.Ok(repository.GetAll()
-    .Select(s=>new SubscriberDto{
-        Guid = s.Guid,
-        Address = s.Address,
-        Fullname = s.Fullname,
-        PhoneNumber = s.PhoneNumber
-    })
-    .ToList());
+    return Results.Ok(subscriberService.List());
 });
-app.MapPost("/subs/add", (IRepository<Subscriber> repository, SubscriberAddOrUpdateDto sub) =>
+app.MapPost("/subs/add", (SubscriberService subscriberService, SubscriberAddOrUpdateDto sub) =>
 {
-    var s = new Subscriber{
-        Address = sub.Address,
-        Fullname = sub.Fullname,
-        PhoneNumber = sub.PhoneNumber
-    };
-    repository.Add(s);
+    subscriberService.Add(sub);
 });
-app.MapPut("/subs/update/{guid}", (IRepository<Subscriber> repository, string guid, SubscriberAddOrUpdateDto sub) =>
+app.MapPut("/subs/update/{guid}", (SubscriberService subscriberService, string guid, SubscriberAddOrUpdateDto sub) =>
 {
-    var dbSub = repository.GetByGuid(guid);
-    if (dbSub != null)
-    {
-        dbSub.Address = sub.Address;
-        dbSub.Fullname = sub.Fullname;
-        dbSub.PhoneNumber = sub.PhoneNumber;
-        repository.Update(dbSub);
-        return Results.Ok();
-    }
-    return Results.NotFound();
+    subscriberService.Update(guid, sub);
 });
-app.MapDelete("/subs/delete/{guid}", (IRepository<Subscriber> repository, string guid) =>
+app.MapDelete("/subs/delete/{guid}", (SubscriberService subscriberService, string guid) =>
 {
-    var dbSub = repository.GetByGuid(guid);
-    if (dbSub != null)
-    {
-        repository.Remove(dbSub);
-        return Results.Ok();
-    }
-    return Results.NotFound();
+    subscriberService.Remove(guid);
 });
 
 
