@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.DataProtection.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Novin.Library.Backend.API.DbContexts;
 using Novin.Library.Backend.API.DTOs.Books;
+using Novin.Library.Backend.API.DTOs.Borrows;
 using Novin.Library.Backend.API.DTOs.Subscribers;
 using Novin.Library.Backend.API.Entities;
 using Novin.Library.Backend.API.Interfaces;
@@ -117,13 +118,31 @@ app.MapDelete("/subs/delete/{guid}", (IRepository<Subscriber> repository, string
 
 app.MapGet("/borrows/list", (IRepository<Borrow> repository) =>
 {
-    return Results.Ok(repository.GetAll().ToList());
+    return Results.Ok(repository.GetAll()
+    .Select(b => new BorrowDto{
+        Guid = b.Guid,
+        BorrowDate = b.BorrowDate,
+        ReturnDate = b.ReturnDate,
+        Book = b.Book,
+        BookId = b.BookId,
+        Subscriber = b.Subscriber,
+        SubscriberId = b.SubscriberId
+    })
+    .ToList());
 });
-app.MapPost("/borrows/add", (IRepository<Borrow> repository, Borrow borrow) =>
+app.MapPost("/borrows/add", (IRepository<Borrow> repository, BorrowAddOrUpdateDto borrow) =>
 {
-    repository.Add(borrow);
+    var b = new Borrow{
+        BorrowDate = borrow.BorrowDate,
+        ReturnDate = borrow.ReturnDate,
+        Book = borrow.Book,
+        BookId = borrow.BookId,
+        Subscriber = borrow.Subscriber,
+        SubscriberId = borrow.SubscriberId
+    };
+    repository.Add(b);
 });
-app.MapPut("/borrows/update/{guid}", (IRepository<Borrow> repository, string guid, Borrow borrow) =>
+app.MapPut("/borrows/update/{guid}", (IRepository<Borrow> repository, string guid, BorrowAddOrUpdateDto borrow) =>
 {
     var dbBorrow = repository.GetByGuid(guid);
     if (dbBorrow != null)
