@@ -4,12 +4,13 @@ using System.Linq;
 using System.Threading.Tasks;
 using Novin.Library.Backend.API.DbContexts;
 using Novin.Library.Backend.API.Entities;
+using Novin.Library.Backend.API.Interfaces;
 
 namespace Novin.Library.Backend.API.Repositories
 {
     public class SubscriberRepository : GenericRepository<Subscriber>
     {
-        public SubscriberRepository(LibraryDB db) : base(db)
+        public SubscriberRepository(IUnitOfWork unitOfWork) : base(unitOfWork)
         {
         }
 

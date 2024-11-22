@@ -4,13 +4,14 @@ using System.Linq;
 using System.Threading.Tasks;
 using Novin.Library.Backend.API.DbContexts;
 using Novin.Library.Backend.API.Entities;
+using Novin.Library.Backend.API.Interfaces;
 
 namespace Novin.Library.Backend.API.Repositories
 {
     public class BorrowRepository : GenericRepository<Borrow>
     {
         // Class ctor
-        public BorrowRepository(LibraryDB db) : base(db)
+        public BorrowRepository(IUnitOfWork unitOfWork) : base(unitOfWork)
         {
         }
         // Some class methods implementations

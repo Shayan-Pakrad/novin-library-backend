@@ -13,14 +13,14 @@ namespace Novin.Library.Backend.API.Repositories
     {
 
         // Class properties
-        private readonly LibraryDB _db;
+        private readonly IUnitOfWork _unitOfWork;
         private readonly DbSet<TEntity> _dbSet;
 
         // Class ctor
-        public GenericRepository(LibraryDB db)
+        public GenericRepository(IUnitOfWork unitOfWork)
         {
-            _db = db;
-            _dbSet = db.Set<TEntity>();
+            _unitOfWork = unitOfWork;
+            _dbSet = _unitOfWork.GetDbSet<TEntity>();
         }
 
         // Class method implementations
@@ -53,7 +53,7 @@ namespace Novin.Library.Backend.API.Repositories
         }
         public virtual void Save()
         {
-            _db.SaveChanges();
+            _unitOfWork.Save();
         }
     }
 }
