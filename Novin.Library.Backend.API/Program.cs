@@ -8,6 +8,7 @@ using Novin.Library.Backend.API.Entities;
 using Novin.Library.Backend.API.Interfaces;
 using Novin.Library.Backend.API.Repositories;
 using Novin.Library.Backend.API.Services;
+using Novin.Library.Backend.API.UnitOfWorks;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,7 +21,7 @@ builder.Services.AddDbContext<LibraryDB>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("Library"));
 });
-
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IRepository<Book>, BookRepository>();
 builder.Services.AddScoped<IRepository<Subscriber>, SubscriberRepository>();
 builder.Services.AddScoped<IRepository<Borrow>, BorrowRepository>();

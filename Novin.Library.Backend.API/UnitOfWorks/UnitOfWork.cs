@@ -22,7 +22,11 @@ namespace Novin.Library.Backend.API.UnitOfWorks
 
         public IRepository<TEntity> GetRepository<TEntity>() where TEntity : Thing
         {
-           return (IRepository<TEntity>)_serviceProvider.GetServices(typeof(IRepository<TEntity>));
+            var result = _serviceProvider.GetServices(typeof(IRepository<TEntity>));
+            if (result != null){
+                return (IRepository<TEntity>)result;
+            }
+            throw new Exception("Unknown Service");
         }
 
         public DbSet<TEntity> GetDbSet<TEntity>() where TEntity : class
