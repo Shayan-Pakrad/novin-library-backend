@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using Novin.Library.Backend.API.DTOs.Books;
 using Novin.Library.Backend.API.DTOs.Borrows;
 using Novin.Library.Backend.API.DTOs.Subscribers;
@@ -13,10 +14,14 @@ namespace Novin.Library.Backend.API.Services
     public class BorrowService : IService<Borrow, BorrowDto, BorrowAddOrUpdateDto>
     {
         private readonly IRepository<Borrow> _borrows;
+        private readonly IRepository<Book> _books;
+        private readonly IRepository<Subscriber> _subscribers;
 
-        public BorrowService(IRepository<Borrow> borrows)
+        public BorrowService(IRepository<Borrow> borrows, IRepository<Book> books, IRepository<Subscriber> subscribers)
         {
             _borrows = borrows;
+            _books = books;
+            _subscribers = subscribers;
         }
 
         public IEnumerable<BorrowDto> List()
@@ -32,14 +37,12 @@ namespace Novin.Library.Backend.API.Services
                     Price = b.Book.Price,
                     PriceBeTooman = b.Book.Price / 10
                 },
-                BookId = b.BookId,
                 Subscriber = new SubscriberDto{
                     Guid = b.Subscriber.Guid,
                     Fullname = b.Subscriber.Fullname,
                     PhoneNumber = b.Subscriber.PhoneNumber,
                     Address = b.Subscriber.Address
                 },
-                SubscriberId = b.SubscriberId
             })
             .ToList();
         }
@@ -49,8 +52,8 @@ namespace Novin.Library.Backend.API.Services
             var b = new Borrow{
                 BorrowDate = entity.BorrowDate,
                 ReturnDate = entity.ReturnDate,
-                BookId = entity.BookId,
-                SubscriberId = entity.SubscriberId
+                BookId = _books.GetByGuid(entity.BookGuid)?.Id??0,
+                SubscriberId = _subscribers.GetByGuid(entity.SubscriberGuid)?.Id??0
             };
             _borrows.Add(b);
         }
@@ -60,10 +63,10 @@ namespace Novin.Library.Backend.API.Services
             var dbBorrow = _borrows.GetByGuid(guid);
             if (dbBorrow != null)
             {
-                dbBorrow.BookId = entity.BookId;
+                dbBorrow.BookId = _books.GetByGuid(entity.BookGuid)?.Id??0;
                 dbBorrow.BorrowDate = entity.BorrowDate;
                 dbBorrow.ReturnDate = entity.ReturnDate;
-                dbBorrow.SubscriberId = entity.SubscriberId;
+                dbBorrow.SubscriberId = _subscribers.GetByGuid(entity.SubscriberGuid)?.Id??0;
                 _borrows.Update(dbBorrow);
             }
         }
