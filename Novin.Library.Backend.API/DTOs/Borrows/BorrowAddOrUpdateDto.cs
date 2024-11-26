@@ -10,7 +10,7 @@ namespace Novin.Library.Backend.API.DTOs.Borrows
     {
         public DateTime BorrowDate { get; set; }
         public DateTime? ReturnDate { get; set; }
-        public int BookId { get; set; }
-        public int SubscriberId { get; set; }
+        public required string BookGuid { get; set; }
+        public required string SubscriberGuid { get; set; }
     }
 }

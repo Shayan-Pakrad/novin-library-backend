@@ -12,9 +12,7 @@ namespace Novin.Library.Backend.API.DTOs.Borrows
     {
         public required string Guid { get; set; }
         public DateTime BorrowDate { get; set; }
-        public int BookId { get; set; }
         public BookDto? Book { get; set; }
-        public int SubscriberId { get; set; }
         public SubscriberDto? Subscriber { get; set; }
     }
 }
