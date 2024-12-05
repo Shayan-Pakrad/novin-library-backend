@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Novin.Library.Backend.API.DTOs.Books;
 using Novin.Library.Backend.API.Entities;
 using Novin.Library.Backend.API.Interfaces;
+using Novin.Library.Backend.API.Mappers;
 
 namespace Novin.Library.Backend.API.Services
 {
@@ -23,24 +24,13 @@ namespace Novin.Library.Backend.API.Services
         public IEnumerable<BookDto> List()
         {
             return _books.GetAll()
-            .Select(b=>new BookDto
-            {
-                Guid = b.Guid,
-                Title = b.Title,
-                Author = b.Author,
-                Price = b.Price,
-                PriceBeTooman = b.Price / 10
-            })
+            .Select(b=> b.ToBookDto())
             .ToList();
         }
 
         public void Add(BookAddOrUpdateDto entity)
         {
-            var b = new Book{
-                Title = entity.Title,
-                Author = entity.Author,
-                Price = entity.Price
-            };
+            var b = entity.ToBookFromBookDto();
             _books.Add(b);
         }
 
