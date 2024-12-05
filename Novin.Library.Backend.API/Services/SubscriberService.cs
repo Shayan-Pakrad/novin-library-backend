@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Novin.Library.Backend.API.DTOs.Subscribers;
 using Novin.Library.Backend.API.Entities;
 using Novin.Library.Backend.API.Interfaces;
+using Novin.Library.Backend.API.Mappers;
 
 namespace Novin.Library.Backend.API.Services
 {
@@ -20,22 +21,13 @@ namespace Novin.Library.Backend.API.Services
         public IEnumerable<SubscriberDto> List()
         {
             return _subscribers.GetAll()
-            .Select(s=>new SubscriberDto{
-                Guid = s.Guid,
-                Address = s.Address,
-                Fullname = s.Fullname,
-                PhoneNumber = s.PhoneNumber
-            })
+            .Select(s => s.ToSubscriberDto())
             .ToList();
         }
 
         public void Add(SubscriberAddOrUpdateDto entity)
         {
-            var s = new Subscriber{
-                Address = entity.Address,
-                Fullname = entity.Fullname,
-                PhoneNumber = entity.PhoneNumber
-            };
+            var s = entity.ToSubscriberFromSubscriberDto();
             _subscribers.Add(s);
         }
 
