@@ -8,6 +8,7 @@ using Novin.Library.Backend.API.DTOs.Borrows;
 using Novin.Library.Backend.API.DTOs.Subscribers;
 using Novin.Library.Backend.API.Entities;
 using Novin.Library.Backend.API.Interfaces;
+using Novin.Library.Backend.API.Mappers;
 
 namespace Novin.Library.Backend.API.Services
 {
@@ -27,34 +28,15 @@ namespace Novin.Library.Backend.API.Services
         public IEnumerable<BorrowDto> List()
         {
             return _borrows.GetAll()
-            .Select(b => new BorrowDto{
-                Guid = b.Guid,
-                BorrowDate = b.BorrowDate,
-                Book = new BookDto{
-                    Guid = b.Book.Guid,
-                    Title = b.Book.Title,
-                    Author = b.Book.Author,
-                    Price = b.Book.Price,
-                    PriceBeTooman = b.Book.Price / 10
-                },
-                Subscriber = new SubscriberDto{
-                    Guid = b.Subscriber.Guid,
-                    Fullname = b.Subscriber.Fullname,
-                    PhoneNumber = b.Subscriber.PhoneNumber,
-                    Address = b.Subscriber.Address
-                },
-            })
+            .Include(m => m.Book)
+            .Include(m => m.Subscriber)
+            .Select(b => b.ToBorrowDto())
             .ToList();
         }
 
         public void Add(BorrowAddOrUpdateDto entity)
         {
-            var b = new Borrow{
-                BorrowDate = entity.BorrowDate,
-                ReturnDate = entity.ReturnDate,
-                BookId = _books.GetByGuid(entity.BookGuid)?.Id??0,
-                SubscriberId = _subscribers.GetByGuid(entity.SubscriberGuid)?.Id??0
-            };
+            var b = entity.ToBorrowFromBorrowDto(_books.GetByGuid(entity.BookGuid)?.Id ?? 0, _subscribers.GetByGuid(entity.SubscriberGuid)?.Id ?? 0);
             _borrows.Add(b);
         }
 
@@ -63,10 +45,10 @@ namespace Novin.Library.Backend.API.Services
             var dbBorrow = _borrows.GetByGuid(guid);
             if (dbBorrow != null)
             {
-                dbBorrow.BookId = _books.GetByGuid(entity.BookGuid)?.Id??0;
+                dbBorrow.BookId = _books.GetByGuid(entity.BookGuid)?.Id ?? 0;
                 dbBorrow.BorrowDate = entity.BorrowDate;
                 dbBorrow.ReturnDate = entity.ReturnDate;
-                dbBorrow.SubscriberId = _subscribers.GetByGuid(entity.SubscriberGuid)?.Id??0;
+                dbBorrow.SubscriberId = _subscribers.GetByGuid(entity.SubscriberGuid)?.Id ?? 0;
                 _borrows.Update(dbBorrow);
             }
         }
