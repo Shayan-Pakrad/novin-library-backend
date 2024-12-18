@@ -13,6 +13,8 @@ namespace Novin.Library.Backend.API.Repositories
     {
 
         // Class properties
+        private readonly int _pageSize = 10;
+        private readonly int _pageNumber = 1; // we should get this property from request in production
         private readonly IUnitOfWork _unitOfWork;
         private readonly DbSet<TEntity> _dbSet;
 
@@ -26,7 +28,7 @@ namespace Novin.Library.Backend.API.Repositories
         // Class method implementations
         public virtual IQueryable<TEntity> GetAll()
         {
-            return _dbSet;
+            return _dbSet.Skip(_pageSize * (_pageNumber - 1)).Take(_pageSize);
         }
         public virtual async Task<int> AddAsync(TEntity entity)
         {
