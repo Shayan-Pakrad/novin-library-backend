@@ -25,41 +25,45 @@ namespace Novin.Library.Backend.API.Services
             _subscribers = subscribers;
         }
 
-        public IEnumerable<BorrowDto> List()
+        public async Task<IEnumerable<BorrowDto>> ListAsync()
         {
-            return _borrows.GetAll()
+            return await _borrows.GetAll()
             .Include(m => m.Book)
             .Include(m => m.Subscriber)
             .Select(b => b.ToBorrowDto())
-            .ToList();
+            .ToListAsync();
         }
 
-        public void Add(BorrowAddOrUpdateDto entity)
+        public async Task<int> AddAsync(BorrowAddOrUpdateDto entity)
         {
-            var b = entity.ToBorrowFromBorrowDto(_books.GetByGuid(entity.BookGuid)?.Id ?? 0, _subscribers.GetByGuid(entity.SubscriberGuid)?.Id ?? 0);
-            _borrows.Add(b);
+            var bookId = (await _books.GetByGuidAsync(entity.BookGuid))?.Id ?? 0;
+            var subId = (await _subscribers.GetByGuidAsync(entity.SubscriberGuid))?.Id ?? 0;
+            var b = entity.ToBorrowFromBorrowDto(bookId, subId);
+            return await _borrows.AddAsync(b);
         }
 
-        public void Update(string guid, BorrowAddOrUpdateDto entity)
+        public async Task<int> UpdateAsync(string guid, BorrowAddOrUpdateDto entity)
         {
-            var dbBorrow = _borrows.GetByGuid(guid);
+            var dbBorrow = await _borrows.GetByGuidAsync(guid);
             if (dbBorrow != null)
             {
-                dbBorrow.BookId = _books.GetByGuid(entity.BookGuid)?.Id ?? 0;
+                dbBorrow.BookId = (await _books.GetByGuidAsync(entity.BookGuid))?.Id ?? 0;
                 dbBorrow.BorrowDate = entity.BorrowDate;
                 dbBorrow.ReturnDate = entity.ReturnDate;
-                dbBorrow.SubscriberId = _subscribers.GetByGuid(entity.SubscriberGuid)?.Id ?? 0;
-                _borrows.Update(dbBorrow);
+                dbBorrow.SubscriberId = (await _subscribers.GetByGuidAsync(entity.SubscriberGuid))?.Id ?? 0;
+                return await _borrows.UpdateAsync(dbBorrow);
             }
+            return 0;
         }
 
-        public void Remove(string guid)
+        public async Task<int> RemoveAsync(string guid)
         {
-            var dbBorrow = _borrows.GetByGuid(guid);
+            var dbBorrow = await _borrows.GetByGuidAsync(guid);
             if (dbBorrow != null)
             {
-                _borrows.Remove(dbBorrow);
+                return await _borrows.RemoveAsync(dbBorrow);
             }
+            return 0;
         }
     }
 }

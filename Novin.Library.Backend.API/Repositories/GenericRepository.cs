@@ -28,32 +28,32 @@ namespace Novin.Library.Backend.API.Repositories
         {
             return _dbSet;
         }
-        public virtual void Add(TEntity entity)
+        public virtual async Task<int> AddAsync(TEntity entity)
         {
-            _dbSet.Add(entity);
-            Save();
+            await _dbSet.AddAsync(entity);
+            return await SaveAsync();
         }
-        public virtual void Remove(TEntity entity)
+        public virtual async Task<int> RemoveAsync(TEntity entity)
         {
             _dbSet.Remove(entity);
-            Save();
+            return await SaveAsync();
         }
-        public virtual void Update(TEntity entity)
+        public virtual async Task<int> UpdateAsync(TEntity entity)
         {
             _dbSet.Update(entity);
-            Save();
+            return await SaveAsync();
         }
-        public virtual TEntity? GetByGuid(string guid)
+        public virtual async Task<TEntity?> GetByGuidAsync(string guid)
         {
-            return _dbSet.FirstOrDefault(m => m.Guid == guid);
+            return await _dbSet.FirstOrDefaultAsync(m => m.Guid == guid);
         }
-        public virtual TEntity? GetById(int id)
+        public virtual async Task<TEntity?> GetByIdAsync(int id)
         {
-            return _dbSet.FirstOrDefault(m => m.Id == id);
+            return await _dbSet.FirstOrDefaultAsync(m => m.Id == id);
         }
-        public virtual void Save()
+        public virtual async Task<int> SaveAsync()
         {
-            _unitOfWork.Save();
+            return await _unitOfWork.SaveAsync();
         }
     }
 }

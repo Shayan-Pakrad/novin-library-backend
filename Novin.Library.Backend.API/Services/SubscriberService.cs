@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using Novin.Library.Backend.API.DTOs.Subscribers;
 using Novin.Library.Backend.API.Entities;
 using Novin.Library.Backend.API.Interfaces;
@@ -18,38 +19,40 @@ namespace Novin.Library.Backend.API.Services
             _subscribers = subscribers;
         }
 
-        public IEnumerable<SubscriberDto> List()
+        public async Task<IEnumerable<SubscriberDto>> ListAsync()
         {
-            return _subscribers.GetAll()
+            return await _subscribers.GetAll()
             .Select(s => s.ToSubscriberDto())
-            .ToList();
+            .ToListAsync();
         }
 
-        public void Add(SubscriberAddOrUpdateDto entity)
+        public async Task<int> AddAsync(SubscriberAddOrUpdateDto entity)
         {
             var s = entity.ToSubscriberFromSubscriberDto();
-            _subscribers.Add(s);
+            return await _subscribers.AddAsync(s);
         }
 
-        public void Update(string guid, SubscriberAddOrUpdateDto entity)
+        public async Task<int> UpdateAsync(string guid, SubscriberAddOrUpdateDto entity)
         {
-            var dbSub = _subscribers.GetByGuid(guid);
+            var dbSub = await _subscribers.GetByGuidAsync(guid);
             if (dbSub != null)
             {
                 dbSub.Address = entity.Address;
                 dbSub.Fullname = entity.Fullname;
                 dbSub.PhoneNumber = entity.PhoneNumber;
-                _subscribers.Update(dbSub);
+                return await _subscribers.UpdateAsync(dbSub);
             }
+            return 0;
         }
         
-        public void Remove(string guid)
+        public async Task<int> RemoveAsync(string guid)
         {
-            var dbSub = _subscribers.GetByGuid(guid);
+            var dbSub = await _subscribers.GetByGuidAsync(guid);
             if (dbSub != null)
             {
-                _subscribers.Remove(dbSub);
+                return await _subscribers.RemoveAsync(dbSub);
             }
+            return 0;
         }
     }
 }

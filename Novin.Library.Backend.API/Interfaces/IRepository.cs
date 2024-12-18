@@ -9,12 +9,12 @@ namespace Novin.Library.Backend.API.Interfaces
     public interface IRepository<TEntity> where TEntity : Thing
     {
         IQueryable<TEntity> GetAll();
-        void Add(TEntity entity);
-        void Update(TEntity entity);
-        void Remove(TEntity entity);
-        TEntity? GetById(int id);
-        TEntity? GetByGuid(string guid);
-        void Save();
+        Task<int> AddAsync(TEntity entity);
+        Task<int> UpdateAsync(TEntity entity);
+        Task<int> RemoveAsync(TEntity entity);
+        Task<TEntity?> GetByIdAsync(int id);
+        Task<TEntity?> GetByGuidAsync(string guid);
+        Task<int> SaveAsync();
 
     }
 }

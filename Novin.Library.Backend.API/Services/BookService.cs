@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using Novin.Library.Backend.API.DTOs.Books;
 using Novin.Library.Backend.API.Entities;
 using Novin.Library.Backend.API.Interfaces;
@@ -21,38 +22,40 @@ namespace Novin.Library.Backend.API.Services
         }
 
         // Method implementations
-        public IEnumerable<BookDto> List()
+        public async Task<IEnumerable<BookDto>> ListAsync()
         {
-            return _books.GetAll()
+            return await _books.GetAll()
             .Select(b=> b.ToBookDto())
-            .ToList();
+            .ToListAsync();
         }
 
-        public void Add(BookAddOrUpdateDto entity)
+        public async Task<int> AddAsync(BookAddOrUpdateDto entity)
         {
             var b = entity.ToBookFromBookDto();
-            _books.Add(b);
+            return await _books.AddAsync(b);
         }
 
-        public void Update(string guid, BookAddOrUpdateDto entity)
+        public async Task<int> UpdateAsync(string guid, BookAddOrUpdateDto entity)
         {
-            var dbBook = _books.GetByGuid(guid);
+            var dbBook = await _books.GetByGuidAsync(guid);
             if (dbBook != null)
             {
                 dbBook.Author = entity.Author;
                 dbBook.Price = entity.Price;
                 dbBook.Title = entity.Title;
-                _books.Update(dbBook);
+                return await _books.UpdateAsync(dbBook);
             }
+            return 0;
         }
 
-        public void Remove(string guid)
+        public async Task<int> RemoveAsync(string guid)
         {
-            var dbBook = _books.GetByGuid(guid);
+            var dbBook = await _books.GetByGuidAsync(guid);
             if (dbBook != null)
             {
-                _books.Remove(dbBook);
+                return await _books.RemoveAsync(dbBook);
             }
+            return 0;
         }
         
     }

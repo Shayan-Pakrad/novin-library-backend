@@ -34,9 +34,9 @@ namespace Novin.Library.Backend.API.UnitOfWorks
             return _db.Set<TEntity>();
         }
 
-        public int Save()
+        public async Task<int> SaveAsync()
         {
-            return _db.SaveChanges();
+            return await _db.SaveChangesAsync();
         }
     }
 }

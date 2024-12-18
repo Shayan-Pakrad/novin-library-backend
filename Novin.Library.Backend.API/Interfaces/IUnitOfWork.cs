@@ -11,6 +11,6 @@ namespace Novin.Library.Backend.API.Interfaces
     {
         IRepository<TEntity> GetRepository<TEntity>() where TEntity : Thing;
         DbSet<TEntity> GetDbSet<TEntity>() where TEntity : class;
-        int Save();
+        Task<int> SaveAsync();
     }
 }

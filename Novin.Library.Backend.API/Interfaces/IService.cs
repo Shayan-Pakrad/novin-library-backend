@@ -8,9 +8,9 @@ namespace Novin.Library.Backend.API.Interfaces
 {
     public interface IService<TEntity, TEntityDto, TAddOrUpdateDto> where TEntity : Thing
     {
-        IEnumerable<TEntityDto> List();
-        void Add(TAddOrUpdateDto entity);
-        void Update(string guid, TAddOrUpdateDto entity);
-        void Remove(string guid);
+        Task<IEnumerable<TEntityDto>> ListAsync();
+        Task<int> AddAsync(TAddOrUpdateDto entity);
+        Task<int> UpdateAsync(string guid, TAddOrUpdateDto entity);
+        Task<int> RemoveAsync(string guid);
     }
 }

@@ -17,12 +17,13 @@ namespace Novin.Library.Backend.API.Repositories
         {
             return base.GetAll().Where(b => b.Price > 0);
         }
-        public override void Add(Book entity)
+        public override async Task<int> AddAsync(Book entity)
         {
             if (entity.Author != "ali")
             {
-                base.Add(entity);
+                return await base.AddAsync(entity);
             }
+            return 0;
         }
     }
 }

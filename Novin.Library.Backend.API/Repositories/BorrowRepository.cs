@@ -19,18 +19,18 @@ namespace Novin.Library.Backend.API.Repositories
         {
             return base.GetAll().Where(m => m.ReturnDate == null);
         }
-        public override Borrow? GetById(int id)
+        public override async Task<Borrow?> GetByIdAsync(int id)
         {
-            var result = base.GetById(id);
+            var result = await base.GetByIdAsync(id);
             if (result != null && result.ReturnDate != null)
             {
                 return null;
             }
             return result;
         }
-        public override Borrow? GetByGuid(string guid)
+        public override async Task<Borrow?> GetByGuidAsync(string guid)
         {
-            var result = base.GetByGuid(guid);
+            var result = await base.GetByGuidAsync(guid);
             if (result != null && result.ReturnDate != null)
             {
                 return null;

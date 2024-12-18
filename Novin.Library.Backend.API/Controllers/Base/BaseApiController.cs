@@ -22,23 +22,23 @@ namespace Novin.Library.Backend.API.Controllers.Base
         }
 
         [HttpGet("list")]
-        public virtual IResult List() {
-            return Results.Ok(_service.List());
+        public virtual async Task<IResult> ListAsync() {
+            return Results.Ok(await _service.ListAsync());
         }
 
         [HttpPost("add")]
-        public virtual void Add(TAddOrUpdateDto entity) {
-            _service.Add(entity);
+        public virtual async Task<int> AddAsync(TAddOrUpdateDto entity) {
+            return await _service.AddAsync(entity);
         }
 
         [HttpPut("update/{guid}")]
-        public virtual void Update(string guid, TAddOrUpdateDto entity) {
-            _service.Update(guid, entity);
+        public virtual async Task<int> UpdateAsync(string guid, TAddOrUpdateDto entity) {
+            return await _service.UpdateAsync(guid, entity);
         }
 
         [HttpDelete("delete/{guid}")]
-        public virtual void Delete(string guid) {
-            _service.Remove(guid);
+        public virtual async Task<int> DeleteAsync(string guid) {
+            return await _service.RemoveAsync(guid);
         }
     }
 }
