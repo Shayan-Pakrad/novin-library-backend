@@ -6,6 +6,7 @@ using Novin.Library.Backend.API.DTOs.Borrows;
 using Novin.Library.Backend.API.DTOs.Subscribers;
 using Novin.Library.Backend.API.Entities;
 using Novin.Library.Backend.API.Interfaces;
+using Novin.Library.Backend.API.Middlewares;
 using Novin.Library.Backend.API.Repositories;
 using Novin.Library.Backend.API.Services;
 using Novin.Library.Backend.API.UnitOfWorks;
@@ -29,8 +30,15 @@ builder.Services.AddScoped<BookService, BookService>();
 builder.Services.AddScoped<SubscriberService, SubscriberService>();
 builder.Services.AddScoped<BorrowService, BorrowService>();
 builder.Services.AddControllers();
+builder.Services.AddAuthentication();
+builder.Services.AddAuthorization();
+builder.Services.AddIdentityApiEndpoints<LibraryUser>()
+    .AddEntityFrameworkStores<LibraryDB>();
 
 var app = builder.Build();
+
+app.UseAuthentication();
+app.UseAuthorization();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -40,6 +48,15 @@ if (app.Environment.IsDevelopment())
 }
 
 // app.UseHttpsRedirection();
+
+// app.MapIdentityApi<LibraryUser>();
+
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    await SecuritySeed.FirstRun(services);
+}
+
 
 app.MapControllers();
 
